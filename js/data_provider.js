@@ -1,35 +1,12 @@
-/**
- * data_provider.js
- * Carga y transforma datos desde Google Sheets (formato CSV).
- * Expone window.DataProvider con métodos para cargar hojas y datos de competencias.
- * No usa librerías externas.
- */
 
 window.DataProvider = (function() {
     'use strict';
-
-    // ============================================================
-    // 1. CACHÉ EN MEMORIA
-    // ============================================================
     const cache = new Map();
 
-    // ============================================================
-    // 2. FUNCIONES AUXILIARES DE NORMALIZACIÓN DE ENCABEZADOS
-    // ============================================================
-
-    /**
-     * Normaliza el nombre de un encabezado a un nombre canónico para ciertos campos,
-     * manteniendo el resto sin cambios (recortando espacios).
-     * @param {string} header - Encabezado original.
-     * @param {number} index - Índice de la columna (para duplicados).
-     * @param {Map} usedMap - Mapa de nombres ya usados para detectar duplicados.
-     * @returns {string} Nombre normalizado.
-     */
     function normalizeHeader(header, index, usedMap) {
         if (typeof header !== 'string') return header;
         const trimmed = header.trim();
 
-        // Mapeo de patrones a nombres canónicos (incluye español)
         const patterns = [
             { regex: /^\s*team\s*id\s*$/i, canonical: 'teamId' },
             { regex: /^\s*team_id\s*$/i, canonical: 'teamId' },
@@ -60,7 +37,6 @@ window.DataProvider = (function() {
             }
         }
 
-        // Detectar duplicados
         if (usedMap.has(canonical)) {
             const count = usedMap.get(canonical) + 1;
             usedMap.set(canonical, count);
@@ -72,9 +48,6 @@ window.DataProvider = (function() {
         return canonical;
     }
 
-    // ============================================================
-    // 3. PARSEO DE CSV
-    // ============================================================
 
     function parseCsv(csvText) {
         if (!csvText || typeof csvText !== 'string') {
@@ -192,10 +165,6 @@ window.DataProvider = (function() {
         return result;
     }
 
-    // ============================================================
-    // 4. CARGA DE CSV DESDE URL CON CACHÉ Y TIMEOUT
-    // ============================================================
-
     function loadCsv(url, forceRefresh = false) {
         if (!url || typeof url !== 'string') {
             return Promise.reject(new Error('URL inválida para loadCsv'));
@@ -213,7 +182,7 @@ window.DataProvider = (function() {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => {
             controller.abort();
-        }, 15000); // 15 segundos
+        }, 15000); 
 
         return fetch(url, { signal: controller.signal })
             .then(response => {
@@ -228,7 +197,6 @@ window.DataProvider = (function() {
                 return response.text();
             })
             .then(text => {
-                // Detectar si el contenido es HTML (por si el content-type no es fiable)
                 const trimmed = text.trim();
                 if (trimmed.startsWith('<!DOCTYPE html') || trimmed.startsWith('<html')) {
                     throw new Error('Google Sheets devolvió una página HTML. Verifica que el documento sea público y que la pestaña exista.');
@@ -246,9 +214,6 @@ window.DataProvider = (function() {
             });
     }
 
-    // ============================================================
-    // 5. CARGA DE HOJA DE GOOGLE SHEETS (con gviz/tq)
-    // ============================================================
 
     function loadSheet(spreadsheetId, sheetName, forceRefresh = false) {
         if (!spreadsheetId || !sheetName) {
@@ -262,9 +227,6 @@ window.DataProvider = (function() {
         return loadCsv(url, forceRefresh);
     }
 
-    // ============================================================
-    // 6. CARGA COMPLETA DE DATOS DE UNA COMPETENCIA (con fallback local)
-    // ============================================================
 
     function loadCompetitionData(competitionId, monthId, forceRefresh = false) {
         const config = window.TOURNAMENT_CONFIG;
@@ -285,19 +247,16 @@ window.DataProvider = (function() {
             return Promise.reject(new Error(`Mes "${monthId}" no encontrado`));
         }
 
-        // Verificar si se debe usar el modo fallback
         const useFallback = config.site && config.site.useFallbackData === true;
 
         if (useFallback) {
-            // Modo fallback: cargar archivos locales y filtrar por división
-            const divisionNumber = competitionId.replace('div', ''); // "1", "2", ...
-            const divisionLabel = 'DIV ' + divisionNumber; // "DIV 1", "DIV 2", ...
+            const divisionNumber = competitionId.replace('div', ''); 
+            const divisionLabel = 'DIV ' + divisionNumber; 
 
             return Promise.all([
                 loadCsv('data/fallback/teams.csv', forceRefresh),
                 loadCsv('data/fallback/players.csv', forceRefresh)
             ]).then(([teamsData, playersData]) => {
-                // Filtrar por división
                 const filteredTeams = teamsData.filter(row => {
                     const div = row.division || row.DIVISION || '';
                     return div.trim().toUpperCase() === divisionLabel;
@@ -308,7 +267,6 @@ window.DataProvider = (function() {
                     return div.trim().toUpperCase() === divisionLabel;
                 });
 
-                // Devolver la misma estructura que Google Sheets
                 return {
                     competition: compConfig,
                     month: monthConfig,
@@ -324,9 +282,6 @@ window.DataProvider = (function() {
             });
         }
 
-        // ============================================================
-        // MODO NORMAL: Google Sheets
-        // ============================================================
 
         const spreadsheetId = monthConfig.spreadsheetId;
         if (!spreadsheetId || spreadsheetId === 'REEMPLAZAR_ID_SHEET') {
@@ -360,7 +315,6 @@ window.DataProvider = (function() {
                 const teamsResults = results.find(r => r.key === 'teams')?.data || [];
                 const playersResults = results.find(r => r.key === 'players')?.data || [];
 
-                // Validaciones básicas
                 const hasTeamId = (row) => row.teamId && row.teamId.trim() !== '';
                 const hasPlayerId = (row) => row.playerId && row.playerId.trim() !== '';
                 const hasTeamName = (row) => row.teamName && row.teamName.trim() !== '';
@@ -394,18 +348,12 @@ window.DataProvider = (function() {
             });
     }
 
-    // ============================================================
-    // 7. LIMPIAR CACHÉ
-    // ============================================================
 
     function clearCache() {
         cache.clear();
         console.debug('[DataProvider] Caché limpiada');
     }
 
-    // ============================================================
-    // 8. EXPOSICIÓN PÚBLICA
-    // ============================================================
 
     return {
         loadCsv: loadCsv,

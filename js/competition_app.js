@@ -1,16 +1,5 @@
-/**
- * competition_app.js
- * Controlador para las páginas divisionales (div1..div5) y torneos especiales.
- * Detecta la competencia desde data-competition en el body,
- * carga configuración, aplica estilos, y maneja la lógica SPA.
- */
-
 (function() {
     'use strict';
-
-    // ============================================================
-    // 1. VALIDACIÓN DE DEPENDENCIAS
-    // ============================================================
 
     const requiredModules = [
         'TOURNAMENT_CONFIG',
@@ -38,9 +27,6 @@
         return;
     }
 
-    // ============================================================
-    // 2. DETECCIÓN DE COMPETENCIA
-    // ============================================================
 
     const competitionId = document.body.dataset.competition;
     if (!competitionId) {
@@ -70,18 +56,14 @@
         return;
     }
 
-    // ============================================================
-    // 3. VARIABLES GLOBALES DEL MÓDULO
-    // ============================================================
 
     let currentMonthId = config.getActiveMonthId();
     let currentData = null;
     let currentStandings = [];
     let currentMvpRanking = [];
     let currentTeam = null;
-    let requestSequence = 0; // Contador para evitar respuestas obsoletas
+    let requestSequence = 0; 
 
-    // Elementos DOM
     const elements = {
         logo: document.getElementById('competition-logo'),
         name: document.getElementById('competition-name'),
@@ -99,9 +81,6 @@
         retryBtn: document.getElementById('retry-competition')
     };
 
-    // ============================================================
-    // 4. FUNCIONES DE ESTADO (directas sobre los elementos)
-    // ============================================================
 
     function showCompetitionLoading() {
         if (elements.loadingEl) elements.loadingEl.style.display = 'flex';
@@ -135,9 +114,6 @@
         if (elements.emptyEl) elements.emptyEl.style.display = 'none';
     }
 
-    // ============================================================
-    // 5. APLICAR CONFIGURACIÓN VISUAL
-    // ============================================================
 
     function applyBranding() {
         document.title = `${compConfig.name} · Sistema de Torneos`;
@@ -180,10 +156,6 @@
         }
     }
 
-    // ============================================================
-    // 6. NAVEGACIÓN ACTIVA (corregida)
-    // ============================================================
-
     function updateActiveCompetitionLinks() {
         const targetHref = compConfig.html || '';
         document.querySelectorAll('.nav-link').forEach(link => {
@@ -198,9 +170,6 @@
         });
     }
 
-    // ============================================================
-    // 7. FEATURE FLAGS
-    // ============================================================
 
     function applyFeatureFlags() {
         const features = compConfig.features || {};
@@ -240,9 +209,6 @@
         }
     }
 
-    // ============================================================
-    // 8. FUNCIONES DE RENDERIZADO
-    // ============================================================
 
     function countDistinctMatches(standings) {
         const matchNumbers = new Set();
@@ -560,18 +526,13 @@
         }
     }
 
-    // ============================================================
-    // 9. CARGA DE DATOS Y RENDERIZADO COMPLETO (con protección de secuencia)
-    // ============================================================
 
     function loadAndRender(monthId, forceRefresh = false) {
-        // Incrementar secuencia y guardar ID de esta solicitud
         const requestId = ++requestSequence;
         showCompetitionLoading();
 
         DataProvider.loadCompetitionData(competitionId, monthId, forceRefresh)
             .then(data => {
-                // Si esta solicitud ya no es la más reciente, ignorar
                 if (requestId !== requestSequence) {
                     console.log('[competition_app] Solicitud obsoleta, ignorando resultados.');
                     return;
@@ -610,7 +571,6 @@
                 console.log(`[competition_app] Datos cargados para ${competitionId} - ${monthId}`);
             })
             .catch(error => {
-                // Si esta solicitud ya no es la más reciente, ignorar el error
                 if (requestId !== requestSequence) {
                     console.log('[competition_app] Solicitud obsoleta, ignorando error.');
                     return;
@@ -619,16 +579,12 @@
                 showCompetitionError(error.message || 'Error al cargar los datos.');
             })
             .finally(() => {
-                // Ocultar loading solo si es la solicitud actual
                 if (requestId === requestSequence && elements.loadingEl) {
                     elements.loadingEl.style.display = 'none';
                 }
             });
     }
 
-    // ============================================================
-    // 10. INICIALIZACIÓN
-    // ============================================================
 
     function init() {
         applyBranding();

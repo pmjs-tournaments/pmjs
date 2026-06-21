@@ -1,29 +1,9 @@
-/**
- * ui.js
- * Centraliza funciones compartidas de interfaz: menú responsive, navegación SPA, modal,
- * estados de carga/error/vacío, manejo de imágenes, formateo y escape.
- * Expone window.UI.
- */
-
 window.UI = (function() {
     'use strict';
 
-    // ============================================================
-    // 1. VARIABLES PRIVADAS
-    // ============================================================
-
-    let previousFocus = null;        // Elemento que tenía foco antes de abrir modal
+    let previousFocus = null;        
     let modalIsOpen = false;
 
-    // ============================================================
-    // 2. ESCAPE DE HTML (seguridad)
-    // ============================================================
-
-    /**
-     * Escapa caracteres HTML para prevenir inyección.
-     * @param {string} value - Texto a escapar.
-     * @returns {string} Texto escapado.
-     */
     function escapeHtml(value) {
         if (value === null || value === undefined) return '';
         const str = String(value);
@@ -37,15 +17,6 @@ window.UI = (function() {
         return str.replace(/[&<>"']/g, function(m) { return map[m]; });
     }
 
-    // ============================================================
-    // 3. FORMATEO DE NÚMEROS
-    // ============================================================
-
-    /**
-     * Formatea un número para mostrar (con separadores de miles si es entero).
-     * @param {number|string} value - Número a formatear.
-     * @returns {string} Número formateado.
-     */
     function formatNumber(value) {
         if (value === null || value === undefined || value === '') return '0';
         const num = Number(value);
@@ -56,17 +27,6 @@ window.UI = (function() {
         return num.toLocaleString('es', { minimumFractionDigits: 1, maximumFractionDigits: 2 });
     }
 
-    // ============================================================
-    // 4. MANEJO DE IMÁGENES CON FALLBACK
-    // ============================================================
-
-    /**
-     * Crea un elemento <img> con fallback en caso de error o src vacío.
-     * @param {string} src - URL de la imagen.
-     * @param {string} alt - Texto alternativo.
-     * @param {string} fallback - URL de la imagen de respaldo.
-     * @returns {HTMLImageElement} Elemento img configurado.
-     */
     function createSafeImage(src, alt, fallback) {
         const img = document.createElement('img');
         img.alt = escapeHtml(alt) || 'Imagen';
@@ -90,11 +50,6 @@ window.UI = (function() {
         return img;
     }
 
-    /**
-     * Aplica fallback a una imagen existente.
-     * @param {HTMLImageElement} img - Elemento img.
-     * @param {string} fallback - URL de fallback.
-     */
     function applyImageFallback(img, fallback) {
         if (!img || !(img instanceof HTMLImageElement)) return;
         const fallbackSrc = fallback || 'assets/default-team.png';
@@ -113,15 +68,6 @@ window.UI = (function() {
         });
     }
 
-    // ============================================================
-    // 5. ESTADOS: LOADING, ERROR, EMPTY (legacy)
-    // ============================================================
-
-    /**
-     * Muestra u oculta el estado de carga en un contenedor.
-     * @param {HTMLElement|string} container - Elemento o selector del contenedor.
-     * @param {boolean} visible - true para mostrar loading, false para ocultar.
-     */
     function setLoading(container, visible) {
         const el = typeof container === 'string' ? document.querySelector(container) : container;
         if (!el) return;
@@ -150,11 +96,6 @@ window.UI = (function() {
         }
     }
 
-    /**
-     * Muestra un mensaje de error en el contenedor (legacy).
-     * @param {HTMLElement|string} container - Elemento o selector.
-     * @param {string} message - Mensaje de error (será escapado).
-     */
     function _showErrorLegacy(container, message) {
         const el = typeof container === 'string' ? document.querySelector(container) : container;
         if (!el) return;
@@ -184,11 +125,6 @@ window.UI = (function() {
         errorEl.style.display = 'flex';
     }
 
-    /**
-     * Muestra un mensaje de estado vacío en el contenedor (legacy).
-     * @param {HTMLElement|string} container - Elemento o selector.
-     * @param {string} message - Mensaje (será escapado).
-     */
     function _showEmptyLegacy(container, message) {
         const el = typeof container === 'string' ? document.querySelector(container) : container;
         if (!el) return;
@@ -217,25 +153,11 @@ window.UI = (function() {
         emptyEl.style.display = 'flex';
     }
 
-    // ============================================================
-    // 6. FUNCIONES DE COMPATIBILIDAD PARA index_app.js
-    // ============================================================
-
-    /**
-     * Inicializa componentes UI comunes: menú responsive y año en footer.
-     */
     function init() {
         initResponsiveMenu();
         setCurrentYear();
     }
 
-    /**
-     * Configura el selector de meses usando TOURNAMENT_CONFIG.months.
-     * @param {string} selectId - ID del elemento <select>.
-     * @param {string} activeMonthId - ID del mes que debe quedar seleccionado.
-     * @param {Function} onChange - Callback cuando cambia el mes.
-     * @returns {string|null} El ID del mes activo (seleccionado o el pasado).
-     */
     function setupMonthSelector(selectId, activeMonthId, onChange) {
         const select = document.getElementById(selectId);
         if (!select) return null;
@@ -243,67 +165,37 @@ window.UI = (function() {
         const config = window.TOURNAMENT_CONFIG;
         const months = config && config.months ? config.months : {};
 
-        // Usamos populateMonthSelector (existente) para llenar el select
         populateMonthSelector(months, activeMonthId, onChange);
 
-        // Devolver el valor seleccionado (puede ser el activeMonthId o el primero)
         return select.value || activeMonthId;
     }
 
-    /**
-     * Obtiene el mes actualmente seleccionado en el selector.
-     * @param {string} selectId - ID del elemento <select>.
-     * @returns {string|null} Valor del select o null.
-     */
     function getActiveMonth(selectId) {
         const select = document.getElementById(selectId);
         return select ? select.value : null;
     }
 
-    /**
-     * Muestra el estado de carga identificado por stateId.
-     * @param {string} containerId - ID del contenedor (no se usa, se mantiene por compatibilidad).
-     * @param {string} stateId - ID del elemento de carga.
-     */
     function showLoading(containerId, stateId) {
-        // Ocultar todos los estados de error y vacío a nivel global
         document.querySelectorAll('.error-state').forEach(el => el.style.display = 'none');
         document.querySelectorAll('.empty-state').forEach(el => el.style.display = 'none');
 
-        // Mostrar el loading
         const el = document.getElementById(stateId);
         if (el) el.style.display = 'flex';
     }
 
-    /**
-     * Oculta el estado de carga identificado por stateId.
-     * @param {string} containerId - ID del contenedor (no se usa).
-     * @param {string} stateId - ID del elemento de carga.
-     */
     function hideLoading(containerId, stateId) {
         const el = document.getElementById(stateId);
         if (el) el.style.display = 'none';
     }
 
-    /**
-     * Muestra un mensaje de error en el estado identificado por stateId.
-     * @param {string} containerId - ID del contenedor (no se usa).
-     * @param {string} stateId - ID del elemento de error.
-     * @param {string} message - Mensaje de error.
-     * @param {Function} retryFn - Función para reintentar (opcional).
-     */
     function showError(containerId, stateId, message, retryFn) {
-        // Si el segundo argumento es un ID de un elemento que es un estado de error,
-        // usamos la nueva lógica; de lo contrario, legacy.
         const stateEl = document.getElementById(stateId);
         if (stateEl && stateEl.classList.contains('error-state')) {
-            // Nuevo formato
             hideLoading(containerId, null);
             hideEmpty(containerId, null);
             const el = stateEl;
             const p = el.querySelector('p');
             if (p) p.textContent = message || 'Error';
-            // Agregar botón retry si se proporciona
             if (retryFn) {
                 let btn = el.querySelector('button');
                 if (!btn) {
@@ -316,27 +208,15 @@ window.UI = (function() {
             }
             el.style.display = 'flex';
         } else {
-            // Legacy: (container, message)
-            _showErrorLegacy(containerId, stateId); // stateId es el mensaje aquí
+            _showErrorLegacy(containerId, stateId); 
         }
     }
 
-    /**
-     * Oculta el estado de error identificado por stateId.
-     * @param {string} containerId - ID del contenedor (no se usa).
-     * @param {string} stateId - ID del elemento de error.
-     */
     function hideError(containerId, stateId) {
         const el = document.getElementById(stateId);
         if (el) el.style.display = 'none';
     }
 
-    /**
-     * Muestra un mensaje de estado vacío en el elemento identificado por stateId.
-     * @param {string} containerId - ID del contenedor (no se usa).
-     * @param {string} stateId - ID del elemento de vacío.
-     * @param {string} message - Mensaje a mostrar.
-     */
     function showEmpty(containerId, stateId, message) {
         const stateEl = document.getElementById(stateId);
         if (stateEl && stateEl.classList.contains('empty-state')) {
@@ -346,24 +226,15 @@ window.UI = (function() {
             if (p) p.textContent = message || 'Sin datos';
             stateEl.style.display = 'flex';
         } else {
-            // Legacy: (container, message)
             _showEmptyLegacy(containerId, stateId);
         }
     }
 
-    /**
-     * Oculta el estado vacío identificado por stateId.
-     * @param {string} containerId - ID del contenedor (no se usa).
-     * @param {string} stateId - ID del elemento de vacío.
-     */
     function hideEmpty(containerId, stateId) {
         const el = document.getElementById(stateId);
         if (el) el.style.display = 'none';
     }
 
-    // ============================================================
-    // 7. MENÚ RESPONSIVE (HAMBURGUESA)
-    // ============================================================
 
     function initResponsiveMenu() {
         const toggle = document.getElementById('menu-toggle');
@@ -439,10 +310,6 @@ window.UI = (function() {
             }
         });
     }
-
-    // ============================================================
-    // 8. NAVEGACIÓN SPA
-    // ============================================================
 
     function initSpaNavigation() {
         const buttons = document.querySelectorAll('[data-section]');
@@ -520,9 +387,6 @@ window.UI = (function() {
         window.UI.showSection = showSection;
     }
 
-    // ============================================================
-    // 9. MODAL
-    // ============================================================
 
     function openModal(title, content) {
         const modal = document.getElementById('details-modal');
@@ -536,7 +400,6 @@ window.UI = (function() {
 
         previousFocus = document.activeElement;
 
-        // No escapar el título, solo convertir a string
         titleEl.textContent = String(title || 'Detalles');
 
         if (typeof content === 'string') {
@@ -629,9 +492,6 @@ window.UI = (function() {
         modal._closeListeners.push({ el: document, event: 'keydown', handler: escapeHandler });
     }
 
-    // ============================================================
-    // 10. SELECTOR DE MESES (legacy)
-    // ============================================================
 
     function populateMonthSelector(months, activeMonthId, onChange) {
         const select = document.getElementById('month-select');
@@ -678,9 +538,6 @@ window.UI = (function() {
         select._listener = listener;
     }
 
-    // ============================================================
-    // 11. AÑO DINÁMICO EN FOOTER
-    // ============================================================
 
     function setCurrentYear() {
         const yearEl = document.getElementById('footer-year');
@@ -689,16 +546,12 @@ window.UI = (function() {
         }
     }
 
-    // ============================================================
-    // 12. EXPOSICIÓN PÚBLICA
-    // ============================================================
 
     let publicShowSection = function(sectionId) {
         console.warn('[UI] showSection no inicializado aún.');
     };
 
     const ui = {
-        // Funciones existentes (legacy)
         initResponsiveMenu: initResponsiveMenu,
         initSpaNavigation: function() {
             initSpaNavigation();
@@ -722,8 +575,8 @@ window.UI = (function() {
         openModal: openModal,
         closeModal: closeModal,
         setLoading: setLoading,
-        showError: showError,         // polimórfica
-        showEmpty: showEmpty,         // polimórfica
+        showError: showError,         
+        showEmpty: showEmpty,         
         createSafeImage: createSafeImage,
         applyImageFallback: applyImageFallback,
         formatNumber: formatNumber,
@@ -731,7 +584,6 @@ window.UI = (function() {
         setCurrentYear: setCurrentYear,
         populateMonthSelector: populateMonthSelector,
 
-        // Nuevas funciones de compatibilidad para index_app.js
         init: init,
         setupMonthSelector: setupMonthSelector,
         getActiveMonth: getActiveMonth,

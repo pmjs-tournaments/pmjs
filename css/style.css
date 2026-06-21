@@ -1,15 +1,9 @@
-/* ============================================================
-   CSS VARIABLES
-   ============================================================ */
-
 :root {
-    /* Division colors (set by JavaScript) */
     --division-primary: #1e88e5;
     --division-secondary: #42a5f5;
     --division-accent: #90caf9;
     --division-dark: #0d47a1;
 
-    /* Base palette */
     --background-color: #0f1218;
     --surface-color: #181d26;
     --surface-secondary: #202631;
@@ -20,13 +14,11 @@
     --danger-color: #ea5455;
     --warning-color: #ff9f43;
 
-    /* Sizing & spacing */
     --header-height: 72px;
     --content-max-width: 1440px;
     --border-radius: 12px;
     --transition-speed: 180ms;
 
-    /* Typography */
     --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
         Oxygen, Ubuntu, Cantarell, "Helvetica Neue", Arial, sans-serif;
     --font-size-base: 16px;
@@ -37,7 +29,6 @@
     --font-size-2xl: 1.5rem;
     --font-size-3xl: 2rem;
 
-    /* Spacing scale */
     --spacing-xs: 4px;
     --spacing-sm: 8px;
     --spacing-md: 16px;
@@ -45,16 +36,11 @@
     --spacing-xl: 32px;
     --spacing-2xl: 48px;
 
-    /* Z-index layers */
     --z-header: 100;
     --z-overlay: 200;
     --z-mobile-menu: 300;
     --z-modal: 400;
 }
-
-/* ============================================================
-   RESET
-   ============================================================ */
 
 *,
 *::before,
@@ -64,9 +50,6 @@
     box-sizing: border-box;
 }
 
-/* ============================================================
-   HTML & BODY
-   ============================================================ */
 
 html {
     font-size: var(--font-size-base);
@@ -85,9 +68,6 @@ body {
     flex-direction: column;
 }
 
-/* ============================================================
-   PAGE CONTAINER
-   ============================================================ */
 
 .page-container {
     flex: 1 0 auto;
@@ -97,9 +77,6 @@ body {
     width: 100%;
 }
 
-/* ============================================================
-   SITE HEADER
-   ============================================================ */
 
 .site-header {
     position: sticky;
@@ -125,9 +102,6 @@ body {
     height: 100%;
 }
 
-/* ============================================================
-   BRAND / LOGO
-   ============================================================ */
 
 .brand {
     display: flex;
@@ -151,10 +125,9 @@ body {
     color: #fff;
     flex-shrink: 0;
     transition: background-color var(--transition-speed) ease;
-    overflow: hidden; /* Para que la imagen no se salga del círculo */
+    overflow: hidden; 
 }
 
-/* --- Imágenes dentro de logos --- */
 .division-logo img {
     width: 100%;
     height: 100%;
@@ -178,9 +151,6 @@ body {
     margin-left: var(--spacing-xs);
 }
 
-/* ============================================================
-   MAIN NAVIGATION (Desktop)
-   ============================================================ */
 
 .main-navigation {
     display: flex;
@@ -215,10 +185,6 @@ body {
 .nav-link:active {
     transform: scale(0.96);
 }
-
-/* ============================================================
-   MENU TOGGLE (Hamburger)
-   ============================================================ */
 
 .menu-toggle {
     display: none;
@@ -265,10 +231,6 @@ body {
     transform: translateY(-7px) rotate(-45deg);
 }
 
-/* ============================================================
-   MOBILE MENU
-   ============================================================ */
-
 .mobile-menu {
     position: fixed;
     top: 0;
@@ -305,7 +267,6 @@ body {
     border-top: 1px solid var(--border-color);
 }
 
-/* Mobile menu header */
 .mobile-menu-header {
     display: flex;
     align-items: center;
@@ -339,10 +300,6 @@ body {
     background-color: var(--surface-secondary);
 }
 
-/* ============================================================
-   MENU OVERLAY
-   ============================================================ */
-
 .menu-overlay {
     position: fixed;
     inset: 0;
@@ -359,10 +316,6 @@ body {
     opacity: 1;
     visibility: visible;
 }
-
-/* ============================================================
-   SPA NAVIGATION
-   ============================================================ */
 
 .spa-navigation {
     display: flex;
@@ -400,19 +353,15 @@ body {
 .spa-button.is-active {
     color: var(--text-color);
     border-color: var(--division-primary);
-    background-color: var(--division-primary); /* fallback para navegadores sin color-mix */
+    background-color: var(--division-primary); 
     background-color: color-mix(in srgb, var(--division-primary) 14%, transparent);
 }
 
 .spa-button.is-active:hover,
 .spa-button.is-active:focus-visible {
-    background-color: var(--division-primary); /* fallback */
+    background-color: var(--division-primary); 
     background-color: color-mix(in srgb, var(--division-primary) 22%, transparent);
 }
-
-/* ============================================================
-   SPA SECTIONS
-   ============================================================ */
 
 .spa-section {
     display: none;
@@ -433,10 +382,6 @@ body {
         transform: translateY(0);
     }
 }
-
-/* ============================================================
-   PAGE HEADER
-   ============================================================ */
 
 .page-header {
     display: flex;
@@ -460,9 +405,6 @@ body {
     margin-top: var(--spacing-xs);
 }
 
-/* ============================================================
-   MONTH SELECTOR
-   ============================================================ */
 
 .month-selector {
     display: flex;
@@ -501,10 +443,6 @@ body {
     outline: none;
 }
 
-/* ============================================================
-   STATS GRID
-   ============================================================ */
-
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -540,10 +478,6 @@ body {
     color: var(--text-color);
     line-height: 1.2;
 }
-
-/* ============================================================
-   TABLE
-   ============================================================ */
 
 .table-wrapper {
     overflow-x: auto;
@@ -596,7 +530,6 @@ body {
     background-color: var(--surface-secondary);
 }
 
-/* Highlighted row for first place */
 .data-table tbody tr.is-first-place {
     background-color: rgba(40, 199, 111, 0.08);
     border-left: 3px solid var(--success-color);
@@ -605,10 +538,6 @@ body {
 .data-table tbody tr.is-first-place:hover {
     background-color: rgba(40, 199, 111, 0.15);
 }
-
-/* ============================================================
-   TEAM CELL
-   ============================================================ */
 
 .team-cell {
     display: flex;
@@ -637,10 +566,6 @@ body {
     height: 100%;
     object-fit: cover;
 }
-
-/* ============================================================
-   PLAYER CELL
-   ============================================================ */
 
 .player-cell {
     display: flex;
@@ -680,10 +605,6 @@ body {
     display: block;
 }
 
-/* ============================================================
-   CHART WRAPPER
-   ============================================================ */
-
 .chart-wrapper {
     background-color: var(--surface-color);
     border-radius: var(--border-radius);
@@ -700,10 +621,6 @@ body {
     align-items: center;
 }
 
-/* ============================================================
-   LOADING STATE
-   ============================================================ */
-
 .loading-state {
     display: flex;
     flex-direction: column;
@@ -719,10 +636,6 @@ body {
     display: none !important;
 }
 
-/* ============================================================
-   SPINNER
-   ============================================================ */
-
 .spinner {
     width: 40px;
     height: 40px;
@@ -737,10 +650,6 @@ body {
         transform: rotate(360deg);
     }
 }
-
-/* ============================================================
-   EMPTY STATE
-   ============================================================ */
 
 .empty-state {
     display: flex;
@@ -763,10 +672,6 @@ body {
     margin-bottom: var(--spacing-sm);
 }
 
-/* ============================================================
-   ERROR STATE
-   ============================================================ */
-
 .error-state {
     display: flex;
     flex-direction: column;
@@ -785,10 +690,6 @@ body {
 .error-state .error-icon {
     font-size: 48px;
 }
-
-/* ============================================================
-   BUTTONS
-   ============================================================ */
 
 button,
 .button {
@@ -870,10 +771,6 @@ button:focus-visible,
     min-height: 32px;
 }
 
-/* ============================================================
-   SELECT DROPDOWNS (general)
-   ============================================================ */
-
 select {
     padding: var(--spacing-sm) var(--spacing-lg);
     padding-right: var(--spacing-2xl);
@@ -897,10 +794,6 @@ select:focus-visible {
     border-color: var(--division-primary);
     outline: none;
 }
-
-/* ============================================================
-   MODAL
-   ============================================================ */
 
 .modal {
     position: fixed;
@@ -1009,14 +902,9 @@ select:focus-visible {
     flex-shrink: 0;
 }
 
-/* Scroll lock when modal is open */
 body.has-modal-open {
     overflow: hidden;
 }
-
-/* ============================================================
-   DIVISIONS GRID (index.html)
-   ============================================================ */
 
 .divisions-grid {
     display: grid;
@@ -1041,10 +929,8 @@ body.has-modal-open {
     flex-direction: column;
     align-items: center;
     gap: var(--spacing-sm);
-    /* Division colors set via inline style or JS */
 }
 
-/* --- Colores individuales para cada tarjeta --- */
 .division-card:hover {
     transform: translateY(-4px);
     border-color: var(--card-primary, var(--division-primary));
@@ -1111,10 +997,6 @@ body.has-modal-open {
     text-transform: lowercase;
 }
 
-/* ============================================================
-   FOOTER
-   ============================================================ */
-
 .site-footer {
     flex-shrink: 0;
     margin-top: auto;
@@ -1132,26 +1014,17 @@ body.has-modal-open {
     padding: 0 var(--spacing-md);
 }
 
-/* ============================================================
-   ACCESSIBILITY: FOCUS-VISIBLE
-   ============================================================ */
 
 :focus-visible {
     outline: 2px solid var(--division-primary);
     outline-offset: 2px;
 }
 
-/* ============================================================
-   FEATURE DISABLED (para competition_app.js)
-   ============================================================ */
 
 .is-feature-disabled {
     display: none !important;
 }
 
-/* ============================================================
-   CHART CONTAINER
-   ============================================================ */
 
 #progress-chart-container {
     position: relative;
@@ -1163,10 +1036,6 @@ body.has-modal-open {
     width: 100% !important;
     height: 320px !important;
 }
-
-/* ============================================================
-   REDUCED MOTION
-   ============================================================ */
 
 @media (prefers-reduced-motion: reduce) {
     *,
@@ -1213,9 +1082,6 @@ body.has-modal-open {
     }
 }
 
-/* ============================================================
-   RESPONSIVE: TABLET
-   ============================================================ */
 
 @media (max-width: 1024px) {
     .page-title {
@@ -1236,12 +1102,8 @@ body.has-modal-open {
     }
 }
 
-/* ============================================================
-   RESPONSIVE: MOBILE
-   ============================================================ */
 
 @media (max-width: 768px) {
-    /* Hide desktop nav, show hamburger */
     .main-navigation {
         display: none;
     }
@@ -1258,7 +1120,6 @@ body.has-modal-open {
         display: none;
     }
 
-    /* Page header */
     .page-header {
         flex-direction: column;
         align-items: flex-start;
@@ -1282,7 +1143,6 @@ body.has-modal-open {
         min-width: 0;
     }
 
-    /* Stats grid */
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: var(--spacing-sm);
@@ -1300,7 +1160,6 @@ body.has-modal-open {
         font-size: var(--font-size-sm);
     }
 
-    /* SPA navigation */
     .spa-navigation {
         gap: var(--spacing-xs);
         padding: var(--spacing-sm) 0;
@@ -1322,7 +1181,6 @@ body.has-modal-open {
         flex-shrink: 0;
     }
 
-    /* Table */
     .data-table {
         font-size: var(--font-size-sm);
         min-width: 480px;
@@ -1344,7 +1202,6 @@ body.has-modal-open {
         font-size: var(--font-size-sm);
     }
 
-    /* Divisions grid */
     .divisions-grid {
         grid-template-columns: 1fr;
         gap: var(--spacing-md);
@@ -1368,7 +1225,6 @@ body.has-modal-open {
         font-size: var(--font-size-lg);
     }
 
-    /* Modal */
     .modal {
         padding: var(--spacing-sm);
     }
@@ -1405,7 +1261,6 @@ body.has-modal-open {
         min-width: 80px;
     }
 
-    /* Chart */
     .chart-wrapper {
         padding: var(--spacing-md);
     }
@@ -1423,16 +1278,12 @@ body.has-modal-open {
         height: 280px !important;
     }
 
-    /* Footer */
     .site-footer {
         padding: var(--spacing-md) 0;
         font-size: var(--font-size-sm);
     }
 }
 
-/* ============================================================
-   RESPONSIVE: SMALL PHONES
-   ============================================================ */
 
 @media (max-width: 400px) {
     :root {
@@ -1490,9 +1341,6 @@ body.has-modal-open {
     }
 }
 
-/* ============================================================
-   UTILITY HELPERS (optional, minimal)
-   ============================================================ */
 
 .text-center {
     text-align: center;
@@ -1534,9 +1382,6 @@ body.has-modal-open {
     clip: rect(0, 0, 0, 0);
     border: 0;
 }
-/* ============================================================
-   UTILITY HELPERS (optional, minimal)
-   ============================================================ */
 
 .text-center {
     text-align: center;

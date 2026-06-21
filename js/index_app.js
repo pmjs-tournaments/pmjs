@@ -1,37 +1,17 @@
-/**
- * index_app.js
- * Controla index.html: muestra resumen de las cinco divisiones y estadísticas globales.
- * Se ejecuta al cargar DOMContentLoaded.
- * Utiliza DataProvider, Standings, MVP y UI.
- */
-
 (function() {
     'use strict';
 
-    // ============================================================
-    // 0. CONTADOR DE SECUENCIA PARA EVITAR SOBREESCRITURAS
-    // ============================================================
 
     let requestSequence = 0;
-
-    // ============================================================
-    // 1. ESPERAR A QUE EL DOM ESTÉ LISTO
-    // ============================================================
-
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {
         init();
     }
 
-    // ============================================================
-    // 2. INICIALIZACIÓN PRINCIPAL
-    // ============================================================
-
     async function init() {
         console.log('[IndexApp] Inicializando...');
 
-        // Verificar dependencias (sin usar UI hasta que esté validada)
         if (!window.TOURNAMENT_CONFIG) {
             console.error('[IndexApp] TOURNAMENT_CONFIG no disponible.');
             showFallbackError('Configuración no cargada.');
@@ -58,13 +38,10 @@
             return;
         }
 
-        // Inicializar componentes UI compartidos (menú, año, modal)
         UI.init();
 
-        // Configurar enlaces de divisiones en el menú (escritorio y móvil)
         configureCompetitionLinks();
 
-        // Configurar selector de mes
         const monthSelect = document.getElementById('month-select');
         if (monthSelect) {
             const defaultMonth = TOURNAMENT_CONFIG.getActiveMonthId ? TOURNAMENT_CONFIG.getActiveMonthId() : null;
@@ -78,7 +55,6 @@
             showGlobalError('Selector de mes no encontrado.');
         }
 
-        // Configurar botón retry global
         const retryBtn = document.getElementById('retry-global');
         if (retryBtn) {
             retryBtn.addEventListener('click', function() {
@@ -90,9 +66,6 @@
         }
     }
 
-    // ============================================================
-    // 3. CONFIGURAR ENLACES DE DIVISIONES
-    // ============================================================
 
     function configureCompetitionLinks() {
         const links = document.querySelectorAll('[data-division-link]');
@@ -117,9 +90,6 @@
         });
     }
 
-    // ============================================================
-    // 4. CONTAR PARTIDAS ÚNICAS
-    // ============================================================
 
     function countDistinctMatches(standings) {
         const matchSet = new Set();
@@ -136,30 +106,23 @@
         return matchSet.size;
     }
 
-    // ============================================================
-    // 5. CARGA DE DATOS POR MES
-    // ============================================================
 
     let currentMonth = null;
 
     async function loadData(monthId) {
-        // Incrementar secuencia y guardar ID de esta solicitud
         const requestId = ++requestSequence;
         currentMonth = monthId;
 
-        // Mostrar estado de carga
         UI.showLoading('main-content', 'global-loading');
         UI.hideError('main-content', 'global-error');
         UI.hideEmpty('main-content', 'global-empty');
 
-        // Ocultar estadísticas y contenedor de divisiones hasta que carguen
         const statsContainer = document.getElementById('global-stats');
         const divisionsContainer = document.getElementById('divisions-container');
         if (statsContainer) statsContainer.style.display = 'none';
         if (divisionsContainer) divisionsContainer.style.display = 'none';
 
         try {
-            // Obtener competencias habilitadas de tipo "division" o "league"
             const config = window.TOURNAMENT_CONFIG;
             const competitions = config.competitions || {};
             const enabledDivisions = Object.values(competitions).filter(
@@ -173,7 +136,6 @@
                 return;
             }
 
-            // Verificar que el mes tenga spreadsheetId
             const monthConfig = config.getMonthConfig ? config.getMonthConfig(monthId) : null;
             if (!monthConfig || !monthConfig.spreadsheetId || monthConfig.spreadsheetId === 'REEMPLAZAR_ID_SHEET') {
                 UI.hideLoading('main-content', 'global-loading');
@@ -181,23 +143,19 @@
                 return;
             }
 
-            // Cargar datos de cada división en paralelo (cada una captura su propio error)
             const loadPromises = enabledDivisions.map(comp => {
                 return DataProvider.loadCompetitionData(comp.id, monthId)
                     .then(data => ({ competition: comp, data: data, error: null }))
                     .catch(err => ({ competition: comp, data: null, error: err }));
             });
 
-            // Esperar a que todas terminen (incluso las que fallen)
             const results = await Promise.all(loadPromises);
 
-            // Verificar si esta solicitud sigue siendo la más reciente
             if (requestId !== requestSequence) {
                 console.log('[IndexApp] Solicitud obsoleta, ignorando resultados.');
                 return;
             }
 
-            // Procesar resultados
             const divisionData = [];
             let allStandings = [];
             let allMvpRankings = [];
@@ -227,7 +185,6 @@
                     continue;
                 }
 
-                // Procesar standings
                 let standings = [];
                 try {
                     const teamResults = data.results.teams || [];
@@ -240,7 +197,6 @@
                     standings = [];
                 }
 
-                // Procesar MVP
                 let mvpRanking = [];
                 try {
                     const playerResults = data.results.players || [];
@@ -266,15 +222,12 @@
                     anySuccess = true;
                 }
 
-                // Acumular para estadísticas globales
                 allStandings = allStandings.concat(standings);
                 allMvpRankings = allMvpRankings.concat(mvpRanking);
             }
 
-            // Ocultar estado de carga
             UI.hideLoading('main-content', 'global-loading');
 
-            // Si ninguna división tuvo éxito, mostrar error o vacío
             if (!anySuccess) {
                 const allFailed = divisionData.every(d => d.error !== null);
                 if (allFailed) {
@@ -285,18 +238,14 @@
                 return;
             }
 
-            // Calcular total global de partidas únicas por división
             const totalGlobalMatches = divisionData.reduce((sum, division) => {
                 return sum + countDistinctMatches(division.standings || []);
             }, 0);
 
-            // Mostrar estadísticas globales
             renderGlobalStats(allStandings, allMvpRankings, totalGlobalMatches);
 
-            // Mostrar tarjetas de divisiones
             renderDivisionCards(divisionData);
 
-            // Mostrar contenedores
             if (statsContainer) statsContainer.style.display = '';
             if (divisionsContainer) divisionsContainer.style.display = '';
 
@@ -307,9 +256,6 @@
         }
     }
 
-    // ============================================================
-    // 6. FUNCIÓN RETRY
-    // ============================================================
 
     function retryLoad() {
         const month = UI.getActiveMonth('month-select');
@@ -318,12 +264,8 @@
         }
     }
 
-    // ============================================================
-    // 7. RENDERIZAR ESTADÍSTICAS GLOBALES
-    // ============================================================
 
     function renderGlobalStats(allStandings, allMvpRankings, totalGlobalMatches) {
-        // Calcular eliminaciones totales reales (suma de eliminations de cada partida)
         let totalEliminations = 0;
         allStandings.forEach(team => {
             if (Array.isArray(team.matches)) {
@@ -334,7 +276,6 @@
             }
         });
 
-        // Calcular WWCD máximo
         let mostWwcdTeam = null;
         let maxWwcd = 0;
         allStandings.forEach(team => {
@@ -345,7 +286,6 @@
             }
         });
 
-        // Jugador con más eliminaciones
         let topKiller = null;
         let maxKills = 0;
         allMvpRankings.forEach(player => {
@@ -356,7 +296,6 @@
             }
         });
 
-        // Actualizar elementos del DOM
         const statTotalMatches = document.getElementById('stat-total-matches');
         const statTotalKills = document.getElementById('stat-total-kills');
         const statMostWwcd = document.getElementById('stat-most-wwcd');
@@ -374,18 +313,13 @@
         }
     }
 
-    // ============================================================
-    // 8. RENDERIZAR TARJETAS DE DIVISIONES
-    // ============================================================
 
     function renderDivisionCards(divisionData) {
         const container = document.getElementById('divisions-container');
         if (!container) return;
 
-        // Limpiar contenedor
         container.innerHTML = '';
 
-        // Ordenar divisiones por nombre (o id)
         divisionData.sort((a, b) => a.competition.name.localeCompare(b.competition.name));
 
         const config = window.TOURNAMENT_CONFIG;
@@ -397,28 +331,23 @@
             const mvpRanking = item.mvpRanking || [];
             const error = item.error;
 
-            // Determinar líder (primer equipo en standings)
             let leader = null;
             if (standings.length > 0) {
                 leader = standings[0];
             }
 
-            // Determinar MVP (primer jugador en ranking)
             let mvp = null;
             if (mvpRanking.length > 0) {
                 mvp = mvpRanking[0];
             }
 
-            // Calcular partidas disputadas únicas
             const totalMatches = countDistinctMatches(standings);
 
-            // Construir tarjeta
             const card = document.createElement('a');
             card.className = 'division-card';
             card.href = comp.html || '#';
             card.setAttribute('role', 'link');
 
-            // Aplicar colores de la división como variables CSS locales
             const colors = comp.colors || {};
             card.style.setProperty('--card-primary', colors.primary || '#1e88e5');
             card.style.setProperty('--card-secondary', colors.secondary || '#42a5f5');
@@ -428,12 +357,10 @@
             const logoUrl = comp.logo || defaultLogo;
             const escapedLogo = UI.escapeHtml(logoUrl);
 
-            // Escapar nombres
             const compName = UI.escapeHtml(comp.name || 'División');
             const leaderName = leader ? UI.escapeHtml(leader.teamName) || '—' : '—';
             const mvpName = mvp ? UI.escapeHtml(mvp.playerName) || '—' : '—';
 
-            // Construir HTML interno
             let content = `
                 <div class="division-logo" style="background-color: var(--card-primary);">
                     <img src="${escapedLogo}" alt="${compName}" width="64" height="64"
@@ -474,9 +401,6 @@
         });
     }
 
-    // ============================================================
-    // 9. MANEJO DE ERRORES GLOBALES
-    // ============================================================
 
     function showGlobalError(message) {
         UI.showError('main-content', 'global-error', message, retryLoad);
@@ -488,9 +412,6 @@
         if (divisionsContainer) divisionsContainer.style.display = 'none';
     }
 
-    // ============================================================
-    // 10. FALLBACK DE ERROR SIN UI
-    // ============================================================
 
     function showFallbackError(message) {
         const errorEl = document.getElementById('global-error');
@@ -498,22 +419,16 @@
             const p = errorEl.querySelector('p');
             if (p) p.textContent = message || 'Error crítico.';
             errorEl.style.display = 'flex';
-            // Ocultar loading
             const loadingEl = document.getElementById('global-loading');
             if (loadingEl) loadingEl.style.display = 'none';
             const emptyEl = document.getElementById('global-empty');
             if (emptyEl) emptyEl.style.display = 'none';
         } else {
-            // Último recurso
             document.body.innerHTML = `<div class="error-state" style="display:flex;padding:2rem;text-align:center;"><span class="error-icon">⚠️</span><strong>Error</strong><p>${message}</p></div>`;
         }
-        // Detener inicialización
         throw new Error('Inicialización fallida: ' + message);
     }
 
-    // ============================================================
-    // 11. EVENTO DE CAMBIO DE MES
-    // ============================================================
 
     function onMonthChange(newMonth) {
         console.log('[IndexApp] Mes cambiado a:', newMonth);

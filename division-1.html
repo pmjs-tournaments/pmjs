@@ -3,26 +3,22 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="assets/div1.png">
     <title>División 1 · Sistema de Torneos</title>
     <link rel="stylesheet" href="css/style.css" />
 </head>
 <body data-competition="div1">
 
-    <!-- ==================== HEADER ==================== -->
     <header class="site-header" role="banner">
         <div class="header-inner">
 
-            <!-- Brand / Logo (se actualiza desde JS) -->
             <a href="index.html" class="brand" aria-label="Inicio del sistema">
                 <div class="division-logo" id="competition-logo" role="img" aria-label="Logo de la división">
-                    <!-- JS cargará la imagen o texto -->
                 </div>
                 <span class="division-name" id="competition-name">
-                    <!-- JS pondrá el nombre -->
                 </span>
             </a>
 
-            <!-- Desktop navigation (enlaces a todas las páginas) -->
             <nav class="main-navigation" aria-label="Navegación principal">
                 <a href="index.html" class="nav-link">Inicio</a>
                 <a href="division-1.html" class="nav-link is-active" aria-current="page">División 1</a>
@@ -32,7 +28,6 @@
                 <a href="division-5.html" class="nav-link">División 5</a>
             </nav>
 
-            <!-- Hamburger button -->
             <button class="menu-toggle" id="menu-toggle"
                     aria-controls="mobile-menu"
                     aria-expanded="false"
@@ -42,7 +37,6 @@
                 <span></span>
             </button>
 
-            <!-- Mobile menu -->
             <div class="mobile-menu" id="mobile-menu" role="dialog" aria-modal="true" aria-hidden="true">
                 <div class="mobile-menu-header">
                     <span class="brand">
@@ -63,31 +57,25 @@
                 </nav>
             </div>
 
-            <!-- Overlay -->
             <div class="menu-overlay" id="menu-overlay" aria-hidden="true"></div>
 
         </div>
     </header>
 
-    <!-- ==================== MAIN CONTENT ==================== -->
     <main class="page-container" id="main-content">
 
-        <!-- Page header -->
         <header class="page-header">
             <div>
                 <h1 class="page-title" id="competition-page-title">División</h1>
                 <p class="page-description" id="competition-page-description">Estadísticas de la división</p>
             </div>
-            <!-- Mes selector -->
             <div class="month-selector" id="month-selector">
                 <label for="month-select">Mes:</label>
                 <select id="month-select" aria-label="Seleccionar mes">
-                    <!-- Opciones llenadas por JavaScript -->
                 </select>
             </div>
         </header>
 
-        <!-- ====== NAVEGACIÓN SPA ====== -->
         <nav class="spa-navigation" aria-label="Navegación de la división">
             <button class="spa-button is-active" data-section="section-summary" aria-current="page">
                 Resumen
@@ -103,7 +91,6 @@
             </button>
         </nav>
 
-        <!-- ====== ESTADOS (carga, error, vacío) ====== -->
         <div id="competition-loading" class="loading-state" role="status" aria-live="polite">
             <div class="spinner" aria-hidden="true"></div>
             <span>Cargando datos de la división…</span>
@@ -122,19 +109,12 @@
             <p>No se encontraron estadísticas para esta división.</p>
         </div>
 
-        <!-- ============================================================ -->
-        <!-- SECCIÓN: RESUMEN                                               -->
-        <!-- ============================================================ -->
         <section id="section-summary" class="spa-section is-active" aria-labelledby="summary-title">
             <h2 id="summary-title" class="sr-only">Resumen de la división</h2>
             <div class="stats-grid" id="summary-stats">
-                <!-- Las tarjetas se generan desde JavaScript -->
             </div>
         </section>
 
-        <!-- ============================================================ -->
-        <!-- SECCIÓN: TABLA GENERAL                                        -->
-        <!-- ============================================================ -->
         <section id="section-standings" class="spa-section" aria-labelledby="standings-title">
             <h2 id="standings-title" class="sr-only">Tabla general</h2>
             <div class="table-wrapper">
@@ -151,15 +131,11 @@
                         </tr>
                     </thead>
                     <tbody id="standings-body">
-                        <!-- Filas generadas por JS -->
                     </tbody>
                 </table>
             </div>
         </section>
 
-        <!-- ============================================================ -->
-        <!-- SECCIÓN: TABLA MVP                                            -->
-        <!-- ============================================================ -->
         <section id="section-mvp" class="spa-section" aria-labelledby="mvp-title">
             <h2 id="mvp-title" class="sr-only">Tabla MVP</h2>
             <div class="table-wrapper">
@@ -173,33 +149,26 @@
                         </tr>
                     </thead>
                     <tbody id="mvp-body">
-                        <!-- Filas generadas por JS -->
                     </tbody>
                 </table>
             </div>
         </section>
 
-        <!-- ============================================================ -->
-        <!-- SECCIÓN: EVOLUCIÓN POR EQUIPO                                 -->
-        <!-- ============================================================ -->
         <section id="section-team-progress" class="spa-section" aria-labelledby="progress-title">
             <h2 id="progress-title" class="sr-only">Evolución por equipo</h2>
             <div class="chart-controls">
                 <label for="team-select">Seleccionar equipo:</label>
                 <select id="team-select" aria-label="Seleccionar equipo para evolución">
-                    <!-- Opciones llenadas por JS -->
                 </select>
             </div>
             <div class="chart-wrapper" id="progress-chart-wrapper">
                 <div id="progress-chart-container">
-                    <!-- Gráfica renderizada por JS (Chart.js u otro) -->
                 </div>
             </div>
         </section>
 
     </main>
 
-    <!-- ==================== MODAL REUTILIZABLE ==================== -->
     <div class="modal" id="details-modal" role="dialog" aria-modal="true" aria-labelledby="details-modal-title" aria-hidden="true">
         <div class="modal-backdrop" id="details-modal-backdrop"></div>
         <div class="modal-dialog">
@@ -208,7 +177,6 @@
                 <button class="modal-close" id="details-modal-close" aria-label="Cerrar modal">&times;</button>
             </div>
             <div class="modal-body" id="details-modal-body">
-                <!-- Contenido dinámico -->
             </div>
             <div class="modal-footer">
                 <button class="button button-outline" id="details-modal-close-footer">Cerrar</button>
@@ -216,7 +184,6 @@
         </div>
     </div>
 
-    <!-- ==================== FOOTER ==================== -->
     <footer class="site-footer" role="contentinfo">
         <div class="footer-inner">
             <p>
@@ -226,7 +193,6 @@
         </div>
     </footer>
 
-    <!-- ==================== SCRIPTS ==================== -->
     <script src="js/tournament_config.js"></script>
     <script src="js/data_provider.js"></script>
     <script src="js/scoring.js"></script>
